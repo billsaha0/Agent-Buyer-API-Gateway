@@ -47,5 +47,7 @@ next-env.d.ts
 /.claude/
 /.windsurf/
 
+# Local SSL Certificates
+/certs/
+
 !.env.example
-!prisma/aiven-ca.pem
