@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  extensions = [vector]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  price       Int      // In paise (₹100 = 10000 paise)
+  stock       Int
+  description String
+  category    String
+  // Stores the 768-dimensional vector from Gemini text-embedding-004
+  embedding   Unsupported("vector(768)")?
+  
+  orderItems  OrderItem[]
+}
+
+model AgentSession {
+  id            String       @id @default(uuid())
+  agentName     String       // e.g., "Buyer-Agent-Alpha"
+  apiKeyHash    String       @unique // Secure auth for external agents
+  budgetLimit   Int          // Max spend limit in paise
+  budgetSpent   Int          @default(0)
+  status        SessionStatus @default(ACTIVE)
+  expiresAt     DateTime
+  
+  orders        Order[]
+  auditLogs     AuditLog[]
+  createdAt     DateTime     @default(now())
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  sessionId       String
+  session         AgentSession  @relation(fields: [sessionId], references: [id])
+  razorpayOrderId String?       @unique
+  idempotencyKey  String?       @unique // Prevents double-execution
+  amountInPaisa   Int
+  status          OrderStatus   @default(PENDING)
+  
+  items           OrderItem[]
+  createdAt       DateTime      @default(now())
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+}
+
+model AuditLog {
+  id           String       @id @default(uuid())
+  sessionId    String
+  session      AgentSession @relation(fields: [sessionId], references: [id])
+  actionType   String       // "SEARCH", "CHECKOUT_GATED", "ORDER_CREATED"
+  payload      Json?        // Stores the exact intent or failure reason
+  isSuccess    Boolean
+  timestamp    DateTime     @default(now())
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXHAUSTED
+  REVOKED
+}
+
+enum OrderStatus {
+  PENDING
+  AUTHORIZED
+  FAILED
+}
+
+

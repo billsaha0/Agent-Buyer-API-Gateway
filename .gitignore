@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# Caches
+/.agents/
+/.claude/
+/.windsurf/
+
+# Local SSL Certificates
+/certs/
+
+!.env.example
