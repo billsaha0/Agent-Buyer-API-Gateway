@@ -27,31 +27,31 @@ The **Agent-Buyer API Gateway** provides this missing layer.
 ## How It Works
 
 ```text
-AI Buyer
-   │
-   ▼
-/api/v1/agent/tools
-   │
-   ▼
-Semantic Product Search
-   │
-   ▼
-AI Product Selection
-   │
-   ▼
+    AI Buyer
+        │
+        ▼
+    /api/v1/agent/tools
+        │
+        ▼
+    Semantic Product Search
+        │
+        ▼
+    AI Product Selection
+        │
+        ▼
 ┌──────────────────────┐
 │   Security Gates     │
 │ Rate Limit           │
 │ Budget               │
 │ Inventory            │
 │ Idempotency          │
-└──────────┬───────────┘
-           │
-           ▼
-     Razorpay Order
-           │
-           ▼
-      Audit Trail
+└───────┬──────────────┘
+        │
+        ▼
+    Razorpay Order
+        │
+        ▼
+    Audit Trail
 ```
 
 The key principle is:
